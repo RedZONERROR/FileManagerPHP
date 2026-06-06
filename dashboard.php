@@ -18,7 +18,7 @@ $csrfToken = $_SESSION['csrf_token'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo htmlspecialchars($csrfToken); ?>">
-    <title>Mundo PHP File Manager - Dashboard</title>
+    <title>PHP File Manager - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Lucide Icons CDN -->
@@ -40,7 +40,7 @@ $csrfToken = $_SESSION['csrf_token'];
                 <i data-lucide="folder-open" class="w-5 h-5 text-white"></i>
             </div>
             <div>
-                <h1 class="text-md font-bold tracking-tight text-white leading-tight">Mundo FileManager</h1>
+                <h1 class="text-md font-bold tracking-tight text-white leading-tight">File Manager</h1>
                 <p class="text-xs text-indigo-400 font-medium">Zero-Dependency Cloud Portal</p>
             </div>
         </div>

@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Save basic settings
             $stmtSet = $db->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (:key, :value)");
             $stmtSet->bindValue(':key', 'app_name', SQLITE3_TEXT);
-            $stmtSet->bindValue(':value', 'Mundo PHP File Manager', SQLITE3_TEXT);
+            $stmtSet->bindValue(':value', 'PHP File Manager', SQLITE3_TEXT);
             $stmtSet->execute();
 
             $success = "Installation completed successfully! Redirecting in 3 seconds...";
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mundo PHP File Manager - Setup Wizard</title>
+    <title>PHP File Manager - Setup Wizard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>

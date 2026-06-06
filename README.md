@@ -1,4 +1,4 @@
-# Mundo PHP File Manager
+# PHP File Manager
 
 A zero-dependency, self-hosted web file manager written in pure, modern, object-oriented PHP with an SQLite3 backend, multi-user isolation (chrooting), and zero external cloud service reliance.
 
