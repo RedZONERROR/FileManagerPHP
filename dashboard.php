@@ -243,14 +243,27 @@ $csrfToken = $_SESSION['csrf_token'];
     <div id="share-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6">
             <h3 class="text-md font-bold text-white mb-2">Direct Link Public Sharing</h3>
-            <p class="text-xs text-slate-400 mb-4">Anyone with this link can view or download this raw file directly, no token required.</p>
+            <p class="text-xs text-slate-400 mb-4">Anyone with these links can view or download this raw file directly, no token required.</p>
             
             <div class="space-y-4">
-                <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-3">
-                    <span id="share-link-text" class="text-sm text-indigo-400 font-medium truncate flex-1">Generating...</span>
-                    <button onclick="copyShareLink()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition shrink-0" title="Copy Link">
-                        <i data-lucide="copy" class="w-4 h-4"></i>
-                    </button>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Secure Share Link</label>
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-3">
+                        <span id="share-link-text" class="text-sm text-indigo-400 font-medium truncate flex-1">Generating...</span>
+                        <button onclick="copyShareLink('share-link-text')" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition shrink-0" title="Copy Link">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Direct Server Link</label>
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-3">
+                        <span id="direct-link-text" class="text-sm text-indigo-400 font-medium truncate flex-1">Loading...</span>
+                        <button onclick="copyShareLink('direct-link-text')" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition shrink-0" title="Copy Link">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -804,15 +817,22 @@ $csrfToken = $_SESSION['csrf_token'];
             }
         }
 
+        const userStorageSubfolder = "<?php echo ($currentRole === 'owner') ? 'admin' : htmlspecialchars($currentUser); ?>";
+
         // Sharing System
         async function openShareModal(filePath, existingToken) {
             activeSharePath = filePath;
             const textEl = document.getElementById('share-link-text');
+            const directEl = document.getElementById('direct-link-text');
             const disableBtn = document.getElementById('disable-share-btn');
 
+            // Set the direct link
+            const protocol = window.location.protocol;
+            const pathStr = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+            const directUrl = `${protocol}//${window.location.host}${pathStr}/storage/${userStorageSubfolder}/${filePath}`;
+            directEl.textContent = directUrl;
+
             if (existingToken) {
-                const protocol = window.location.protocol;
-                const pathStr = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
                 const shareUrl = `${protocol}//${window.location.host}${pathStr}/index.php?share=${existingToken}`;
                 textEl.textContent = shareUrl;
                 disableBtn.classList.remove('hidden');
@@ -840,10 +860,10 @@ $csrfToken = $_SESSION['csrf_token'];
             document.getElementById('share-modal').classList.add('hidden');
         }
 
-        function copyShareLink() {
-            const link = document.getElementById('share-link-text').textContent;
+        function copyShareLink(elementId) {
+            const link = document.getElementById(elementId).textContent;
             navigator.clipboard.writeText(link).then(() => {
-                showToast("Share link copied to clipboard!");
+                showToast("Link copied to clipboard!");
             });
         }
 

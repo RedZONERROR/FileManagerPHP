@@ -261,6 +261,37 @@ try {
             echo json_encode(['status' => 'success', 'message' => 'File uploaded successfully.']);
             break;
 
+        case 'download':
+            $path = $_GET['file_path'] ?? '';
+            $target = $userStorageRoot . DIRECTORY_SEPARATOR . $path;
+            $resolved = verify_and_resolve_path($target, $userStorageRoot);
+
+            if (!is_file($resolved)) {
+                throw new Exception("File not found.");
+            }
+
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimeType = finfo_file($finfo, $resolved);
+            finfo_close($finfo);
+
+            if (!$mimeType) {
+                $mimeType = 'application/octet-stream';
+            }
+
+            if (ob_get_level()) {
+                ob_end_clean();
+            }
+
+            header('Content-Description: File Transfer');
+            header('Content-Type: ' . $mimeType);
+            header('Content-Disposition: attachment; filename="' . basename($resolved) . '"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($resolved));
+            readfile($resolved);
+            exit;
+
         case 'get_content':
             $path = $_GET['path'] ?? '';
             $target = $userStorageRoot . DIRECTORY_SEPARATOR . $path;
