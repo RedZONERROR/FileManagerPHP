@@ -424,7 +424,15 @@ $csrfToken = $_SESSION['csrf_token'];
                     fetchOptions.body = body;
                 } else {
                     fetchOptions.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-                    fetchOptions.body = new URLSearchParams(body).toString();
+                    const params = new URLSearchParams();
+                    for (const key in body) {
+                        if (Array.isArray(body[key])) {
+                            body[key].forEach(val => params.append(`${key}[]`, val));
+                        } else {
+                            params.append(key, body[key]);
+                        }
+                    }
+                    fetchOptions.body = params.toString();
                 }
             }
 
