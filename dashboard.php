@@ -36,6 +36,9 @@ $csrfToken = $_SESSION['csrf_token'];
     <!-- Top Header -->
     <header class="h-16 flex items-center justify-between px-6 bg-slate-900 border-b border-slate-800 shrink-0">
         <div class="flex items-center gap-3">
+            <button onclick="toggleSidebar(true)" class="md:hidden p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition" title="Open Menu">
+                <i data-lucide="menu" class="w-5 h-5"></i>
+            </button>
             <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/10">
                 <i data-lucide="folder-open" class="w-5 h-5 text-white"></i>
             </div>
@@ -57,14 +60,25 @@ $csrfToken = $_SESSION['csrf_token'];
         </div>
     </header>
 
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-1 overflow-hidden relative">
+        <!-- Sidebar Backdrop for Mobile -->
+        <div id="sidebar-backdrop" class="fixed inset-0 bg-black/60 z-30 hidden md:hidden" onclick="toggleSidebar(false)"></div>
+
         <!-- Sidebar -->
-        <aside class="w-64 bg-slate-900/60 border-r border-slate-800 p-4 flex flex-col justify-between shrink-0 hidden md:flex">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 p-4 flex flex-col justify-between shrink-0 transform -translate-x-full transition-transform duration-300 md:relative md:translate-x-0 md:flex">
             <div class="space-y-6">
+                <!-- Mobile Sidebar Close Header -->
+                <div class="flex items-center justify-between md:hidden pb-2 border-b border-slate-800/60">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Navigation</span>
+                    <button onclick="toggleSidebar(false)" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
                 <div>
                     <h3 class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Explorer</h3>
                     <nav class="space-y-1">
-                        <button onclick="navigateTo('')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-indigo-600/10 text-indigo-400 border border-indigo-500/20 transition">
+                        <button onclick="navigateTo(''); toggleSidebar(false);" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-indigo-600/10 text-indigo-400 border border-indigo-500/20 transition animate-pulse-subtle">
                             <i data-lucide="hard-drive" class="w-4 h-4"></i>
                             <span>All Files</span>
                         </button>
@@ -75,7 +89,7 @@ $csrfToken = $_SESSION['csrf_token'];
                 <div>
                     <h3 class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Administration</h3>
                     <nav class="space-y-1">
-                        <button onclick="toggleAdminPanel(true)" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                        <button onclick="toggleAdminPanel(true); toggleSidebar(false);" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
                             <i data-lucide="users" class="w-4 h-4"></i>
                             <span>Manage Users</span>
                         </button>
@@ -89,7 +103,7 @@ $csrfToken = $_SESSION['csrf_token'];
                 <h4 class="text-xs font-semibold text-white mb-2">Upload Files</h4>
                 <div class="space-y-3">
                     <label class="flex items-center gap-2 cursor-pointer text-xs font-medium text-indigo-400 hover:text-indigo-300 transition">
-                        <input type="file" id="sidebar-upload-input" class="hidden" multiple onchange="handleSidebarFiles(this)">
+                        <input type="file" id="sidebar-upload-input" class="hidden" multiple onchange="handleSidebarFiles(this); toggleSidebar(false);">
                         <i data-lucide="plus" class="w-4 h-4"></i>
                         <span>Select files...</span>
                     </label>
@@ -350,6 +364,23 @@ $csrfToken = $_SESSION['csrf_token'];
         let currentPath = '';
         let selectedItems = new Set();
         let activeSharePath = '';
+
+        // Toggle Sidebar Drawer on Mobile
+        function toggleSidebar(show) {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (!sidebar || !backdrop) return;
+            
+            if (show) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                backdrop.classList.remove('hidden');
+            } else {
+                sidebar.classList.remove('translate-x-0');
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
 
         // Initialize Lucide Icons and fetch default directory
         document.addEventListener('DOMContentLoaded', () => {

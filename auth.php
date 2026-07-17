@@ -39,6 +39,11 @@ $mode = $_GET['action'] ?? 'login'; // 'login', 'recover', 'reset'
 
 $db = FileManagerDB::connect();
 
+// Retrieve remember credentials from cookies
+$remember_user = $_COOKIE['remember_user'] ?? '';
+$remember_pass = $_COOKIE['remember_pass'] ?? '';
+$remember_me = !empty($remember_user);
+
 // 1. Process Login
 if ($mode === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
@@ -58,6 +63,15 @@ if ($mode === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['storage_root'] = $user['storage_root'];
+            
+            // Handle Remember Me / Save Option
+            if (isset($_POST['remember'])) {
+                setcookie('remember_user', $username, time() + (30 * 24 * 60 * 60), "/", "", false, true);
+                setcookie('remember_pass', $password, time() + (30 * 24 * 60 * 60), "/", "", false, true);
+            } else {
+                setcookie('remember_user', '', time() - 3600, "/");
+                setcookie('remember_pass', '', time() - 3600, "/");
+            }
             
             header("Location: index.php");
             exit;
@@ -185,6 +199,7 @@ if ($mode === 'reset') {
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Username</label>
                     <input type="text" name="username" required autocomplete="username"
+                           value="<?php echo htmlspecialchars($remember_user); ?>"
                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
                            placeholder="Enter your username">
                 </div>
@@ -195,8 +210,15 @@ if ($mode === 'reset') {
                         <a href="auth.php?action=recover" class="text-xs font-medium text-indigo-400 hover:text-indigo-300">Forgot?</a>
                     </div>
                     <input type="password" name="password" required autocomplete="current-password"
+                           value="<?php echo htmlspecialchars($remember_pass); ?>"
                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
                            placeholder="Enter your password">
+                </div>
+
+                <div class="flex items-center">
+                    <input type="checkbox" id="remember" name="remember" <?php echo $remember_me ? 'checked' : ''; ?>
+                           class="h-4 w-4 rounded border-slate-800 bg-slate-950 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-slate-900 focus:ring-2 accent-indigo-600">
+                    <label for="remember" class="ml-2 block text-sm text-slate-300 cursor-pointer">Remember credentials</label>
                 </div>
 
                 <button type="submit"
